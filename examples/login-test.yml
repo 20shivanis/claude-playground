@@ -16,8 +16,11 @@ scenarios:
         waitForSelector: ".dashboard"   # update to a selector visible after login
         timeout: 60000
 
-      - action: wait
-        ms: 3000
+      - action: waitForValue
+        selector: "#TEFilterSelectBox"
+        value: "182287 (TESOG(EMEA))"
+        timeout: 120000   # wait up to 2 minutes for slow startups
+        interval: 500     # check every 500ms
 
       - action: select
         selector: "#country-dropdown"   # update with real selector

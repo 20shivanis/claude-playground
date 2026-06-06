@@ -79,6 +79,29 @@ async function assertUrl(page, step) {
   }
 }
 
+// Waits until an input's value attribute matches the expected string.
+// Useful for Dojo/dynamic dropdowns that load asynchronously.
+async function waitForValue(page, step) {
+  const timeout = step.timeout ?? 120000; // default 2 min for slow startups
+  const interval = step.interval ?? 500;
+  const expected = step.value;
+  const selector = step.selector;
+
+  if (!selector || expected === undefined) {
+    throw new Error('waitForValue requires "selector" and "value"');
+  }
+
+  const deadline = Date.now() + timeout;
+  while (Date.now() < deadline) {
+    const current = await page.$eval(selector, (el) => el.value ?? el.getAttribute('value') ?? '').catch(() => '');
+    if (current === expected) return;
+    await page.waitForTimeout(interval);
+  }
+
+  const final = await page.$eval(selector, (el) => el.value ?? el.getAttribute('value') ?? '').catch(() => '(element not found)');
+  throw new Error(`waitForValue timed out after ${timeout}ms — expected "${expected}", got "${final}"`);
+}
+
 async function storeText(page, step, context) {
   const locator = page.locator(step.selector);
   await locator.waitFor({ state: 'visible', timeout: step.timeout ?? 30000 });
@@ -92,6 +115,7 @@ const ACTIONS = {
   login,
   select,
   wait,
+  waitForValue,
   screenshot,
   assertText,
   assertUrl,
