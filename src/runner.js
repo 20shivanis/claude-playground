@@ -48,12 +48,16 @@ async function runSteps(steps, opts = {}) {
         throw new Error(`Unknown action: "${actionName}" at step ${i + 1}`);
       }
 
-      console.log(`  [${i + 1}/${steps.length}] ${actionName}${step.selector ? ` → ${step.selector}` : ''}${step.url ? ` → ${step.url}` : ''}`);
+      const label = `${actionName}${step.selector ? ` → ${step.selector}` : ''}${step.url ? ` → ${step.url}` : ''}`;
+      process.stdout.write(`  [${i + 1}/${steps.length}] ${label} ... `);
+      const t0 = Date.now();
       await handler(page, step, context);
+      console.log(`done (${((Date.now() - t0) / 1000).toFixed(1)}s)`);
     }
 
     if (!interrupted) {
-      console.log('  ✓ Scenario completed');
+      const result = context.__lastResult ?? 'PASS';
+      console.log(`\n  ${result === 'PASS' ? '✓' : '✗'} Scenario ${result}`);
 
       if (keepOpen) {
         console.log('  Waiting for browser to be closed...');

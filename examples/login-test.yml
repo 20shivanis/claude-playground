@@ -30,6 +30,14 @@ scenarios:
         state: visible
         timeout: 30000
 
+      - action: click
+        selector: "a[onclick*='goToExportDetail']"
+
+      - action: assertExists
+        selector: "h1"
+        contains: "Your file is in queue for download"
+        timeout: 300000   # wait up to 5 minutes
+
       - action: screenshot
         path: screenshots/scenario1.png
 

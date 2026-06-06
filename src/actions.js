@@ -63,6 +63,30 @@ async function screenshot(page, step) {
   console.log(`  📸 Screenshot saved: ${path}`);
 }
 
+// Waits for a selector and checks its text contains the expected string.
+// Logs PASS or FAIL with timing — does not throw on failure, records result in context.
+async function assertExists(page, step, context) {
+  const timeout = step.timeout ?? 30000;
+  const t0 = Date.now();
+  try {
+    await page.waitForSelector(step.selector, { state: 'visible', timeout });
+    const text = await page.$eval(step.selector, (el) => el.innerText ?? el.textContent ?? '');
+    const elapsed = ((Date.now() - t0) / 1000).toFixed(1);
+    if (step.contains && !text.includes(step.contains)) {
+      console.log(`\n  FAIL — found "${step.selector}" but text was: "${text.trim()}" (${elapsed}s)`);
+      context.__lastResult = 'FAIL';
+    } else {
+      console.log(`\n  PASS — "${text.trim()}" (${elapsed}s)`);
+      context.__lastResult = 'PASS';
+    }
+  } catch {
+    const elapsed = ((Date.now() - t0) / 1000).toFixed(1);
+    const pageText = await page.$eval('body', (el) => el.innerText?.slice(0, 200) ?? '').catch(() => '(could not read page)');
+    console.log(`\n  FAIL — element not found after ${elapsed}s. Page content: "${pageText.trim()}"`);
+    context.__lastResult = 'FAIL';
+  }
+}
+
 async function assertText(page, step) {
   const locator = page.locator(step.selector);
   await locator.waitFor({ state: 'visible', timeout: step.timeout ?? 30000 });
@@ -116,6 +140,7 @@ const ACTIONS = {
   select,
   wait,
   waitForValue,
+  assertExists,
   screenshot,
   assertText,
   assertUrl,
