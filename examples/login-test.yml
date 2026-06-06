@@ -1,0 +1,36 @@
+# Example: Login, select from dropdown, click a button
+browser: chromium
+slowMo: 0
+
+steps:
+  - action: navigate
+    url: https://example.com/login
+
+  - action: login
+    usernameSelector: "#username"
+    passwordSelector: "#password"
+    submitSelector: "button[type=submit]"
+    username: myuser@example.com
+    password: mysecretpassword
+    waitForSelector: ".dashboard"   # wait for this after login
+
+  - action: wait
+    ms: 1000                        # pause 1 second
+
+  - action: select
+    selector: "#country-dropdown"
+    label: "United States"          # can also use: value or index
+
+  - action: click
+    selector: "button#submit-form"
+
+  - action: wait
+    selector: ".success-message"
+    state: visible
+
+  - action: assertText
+    selector: ".success-message"
+    contains: "Submitted successfully"
+
+  - action: screenshot
+    path: screenshots/after-submit.png
