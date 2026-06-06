@@ -1,37 +1,57 @@
-# Example: Login, select from dropdown, click a button
 browser: chromium
 slowMo: 500
 
-steps:
-  - action: navigate
-    url: https://www.te.com/commerce/isd/action/visd_agreement_list
+scenarios:
+  - name: "Scenario 1 - Login and select agreement"
+    steps:
+      - action: navigate
+        url: https://www.te.com/commerce/isd/action/visd_agreement_list
 
-  - action: login
-    usernameSelector: "#USER"
-    passwordSelector: "#PASSWORD"
-    submitSelector: "#signInButton"
-    username: YOUR_USERNAME
-    password: YOUR_PASSWORD
-    waitForSelector: ".dashboard"   # wait for this after login
-    timeout: 30000
+      - action: login
+        usernameSelector: "#USER"
+        passwordSelector: "#PASSWORD"
+        submitSelector: "#signInButton"
+        username: YOUR_USERNAME
+        password: YOUR_PASSWORD
+        waitForSelector: ".dashboard"   # update to a selector visible after login
+        timeout: 60000
 
-  - action: wait
-    ms: 3000                        # pause 3 seconds
+      - action: wait
+        ms: 3000
 
-  - action: select
-    selector: "#country-dropdown"
-    label: "United States"          # can also use: value or index
+      - action: select
+        selector: "#country-dropdown"   # update with real selector
+        label: "United States"          # update with real value
 
-  - action: click
-    selector: "button#submit-form"
+      - action: click
+        selector: "button#submit-form"  # update with real selector
 
-  - action: wait
-    selector: ".success-message"
-    state: visible
+      - action: wait
+        selector: ".success-message"    # update with real selector
+        state: visible
+        timeout: 30000
 
-  - action: assertText
-    selector: ".success-message"
-    contains: "Submitted successfully"
+      - action: screenshot
+        path: screenshots/scenario1.png
 
-  - action: screenshot
-    path: screenshots/after-submit.png
+  - name: "Scenario 2 - Another flow"
+    steps:
+      - action: navigate
+        url: https://www.te.com/commerce/isd/action/visd_agreement_list
+
+      - action: login
+        usernameSelector: "#USER"
+        passwordSelector: "#PASSWORD"
+        submitSelector: "#signInButton"
+        username: YOUR_USERNAME
+        password: YOUR_PASSWORD
+        waitForSelector: ".dashboard"   # update to a selector visible after login
+        timeout: 60000
+
+      - action: wait
+        ms: 3000
+
+      # add more steps for scenario 2...
+
+      - action: screenshot
+        path: screenshots/scenario2.png

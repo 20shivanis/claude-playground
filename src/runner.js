@@ -4,16 +4,8 @@ const { ACTIONS } = require('./actions');
 const BROWSERS = { chromium, firefox, webkit };
 
 /**
- * Run a sequence of steps against a browser page.
- *
- * @param {object[]} steps  - Array of step objects (see actions.js for shapes)
- * @param {object}   opts
- * @param {boolean}  opts.headless   - Run headless (default: true)
- * @param {string}   opts.browser    - 'chromium' | 'firefox' | 'webkit' (default: 'chromium')
- * @param {boolean}  opts.slowMo     - Ms to slow each action by (default: 0)
- * @param {object}   opts.viewport   - { width, height } (default: 1280x720)
- * @param {boolean}  opts.video      - Record video to 'videos/' dir (default: false)
- * @returns {object} context - accumulated stored values from storeText steps
+ * Run a single scenario (array of steps) in its own browser session.
+ * Waits for the browser to be closed manually if keepOpen is true.
  */
 async function runSteps(steps, opts = {}) {
   const {
@@ -22,6 +14,7 @@ async function runSteps(steps, opts = {}) {
     slowMo = 0,
     viewport = { width: 1280, height: 720 },
     video = false,
+    keepOpen = false,
   } = opts;
 
   const browserType = BROWSERS[browserName];
@@ -35,8 +28,18 @@ async function runSteps(steps, opts = {}) {
   const page = await browserContext.newPage();
   const context = {};
 
+  let interrupted = false;
+
+  // Detect if user closes the browser window manually
+  browser.on('disconnected', () => { interrupted = true; });
+
   try {
     for (let i = 0; i < steps.length; i++) {
+      if (interrupted) {
+        console.log('  ⚠ Browser closed by user — stopping scenario');
+        break;
+      }
+
       const step = steps[i];
       const actionName = step.action;
       const handler = ACTIONS[actionName];
@@ -49,15 +52,45 @@ async function runSteps(steps, opts = {}) {
       await handler(page, step, context);
     }
 
-    console.log('  ✓ All steps completed');
-    return context;
+    if (!interrupted) {
+      console.log('  ✓ Scenario completed');
+
+      if (keepOpen) {
+        console.log('  Waiting for browser to be closed...');
+        await new Promise((resolve) => browser.on('disconnected', resolve));
+      }
+    }
+
+    return { context, interrupted };
   } finally {
     if (video) {
       const videoPath = await page.video()?.path();
-      if (videoPath) console.log(`  🎥 Video saved: ${videoPath}`);
+      if (videoPath) console.log(`  Video saved: ${videoPath}`);
     }
-    await browser.close();
+    if (!interrupted) await browser.close();
   }
 }
 
-module.exports = { runSteps };
+/**
+ * Run multiple scenarios sequentially.
+ * Each scenario gets its own browser session.
+ * If a scenario is interrupted (browser closed), remaining scenarios are skipped.
+ */
+async function runScenarios(scenarios, opts = {}) {
+  for (let i = 0; i < scenarios.length; i++) {
+    const scenario = scenarios[i];
+    const name = scenario.name ?? `Scenario ${i + 1}`;
+    console.log(`\n── ${name} (${scenario.steps.length} steps) ──`);
+
+    const { interrupted } = await runSteps(scenario.steps, opts);
+
+    if (interrupted) {
+      console.log(`\n✗ Stopped at "${name}" — remaining scenarios skipped`);
+      return;
+    }
+  }
+
+  console.log('\n✓ All scenarios completed');
+}
+
+module.exports = { runSteps, runScenarios };
