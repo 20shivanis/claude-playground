@@ -7,7 +7,7 @@ steps:
     url: https://www.te.com/commerce/isd/action/visd_agreement_list
 
   - action: login
-    usernameSelector: "#username"
+    usernameSelector: "#USER"
     passwordSelector: "#password"
     submitSelector: "button[type=submit]"
     username: myuser@example.com
