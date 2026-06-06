@@ -22,15 +22,11 @@ scenarios:
         timeout: 120000   # wait up to 2 minutes for slow startups
         interval: 500     # check every 500ms
 
-      - action: select
-        selector: "#country-dropdown"   # update with real selector
-        label: "United States"          # update with real value
-
       - action: click
-        selector: "button#submit-form"  # update with real selector
+        selector: "#tab3"
 
       - action: wait
-        selector: ".success-message"    # update with real selector
+        selector: "#tab3 h5.active"
         state: visible
         timeout: 30000
 
