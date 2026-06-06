@@ -4,7 +4,7 @@ slowMo: 0
 
 steps:
   - action: navigate
-    url: https://example.com/login
+    url: https://www.te.com/commerce/isd/action/visd_agreement_list
 
   - action: login
     usernameSelector: "#username"
