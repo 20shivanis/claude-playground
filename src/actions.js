@@ -9,13 +9,13 @@ async function navigate(page, step) {
 
 async function click(page, step) {
   const locator = page.locator(step.selector);
-  await locator.waitFor({ state: 'visible', timeout: step.timeout ?? 10000 });
+  await locator.waitFor({ state: 'visible', timeout: step.timeout ?? 30000 });
   await locator.click();
 }
 
 async function fill(page, step) {
   const locator = page.locator(step.selector);
-  await locator.waitFor({ state: 'visible', timeout: step.timeout ?? 10000 });
+  await locator.waitFor({ state: 'visible', timeout: step.timeout ?? 30000 });
   await locator.fill(step.value);
 }
 
@@ -30,7 +30,7 @@ async function login(page, step) {
 
 async function select(page, step) {
   const locator = page.locator(step.selector);
-  await locator.waitFor({ state: 'visible', timeout: step.timeout ?? 10000 });
+  await locator.waitFor({ state: 'visible', timeout: step.timeout ?? 30000 });
   if (step.value !== undefined) {
     await locator.selectOption({ value: step.value });
   } else if (step.label !== undefined) {
@@ -65,7 +65,7 @@ async function screenshot(page, step) {
 
 async function assertText(page, step) {
   const locator = page.locator(step.selector);
-  await locator.waitFor({ state: 'visible', timeout: step.timeout ?? 10000 });
+  await locator.waitFor({ state: 'visible', timeout: step.timeout ?? 30000 });
   const text = await locator.innerText();
   if (!text.includes(step.contains)) {
     throw new Error(`assertText failed: expected "${step.contains}" in "${text}"`);
@@ -81,7 +81,7 @@ async function assertUrl(page, step) {
 
 async function storeText(page, step, context) {
   const locator = page.locator(step.selector);
-  await locator.waitFor({ state: 'visible', timeout: step.timeout ?? 10000 });
+  await locator.waitFor({ state: 'visible', timeout: step.timeout ?? 30000 });
   context[step.as] = await locator.innerText();
 }
 

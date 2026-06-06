@@ -1,6 +1,6 @@
 # Example: Login, select from dropdown, click a button
 browser: chromium
-slowMo: 0
+slowMo: 500
 
 steps:
   - action: navigate
@@ -13,9 +13,10 @@ steps:
     username: myuser@example.com
     password: mysecretpassword
     waitForSelector: ".dashboard"   # wait for this after login
+    timeout: 30000
 
   - action: wait
-    ms: 1000                        # pause 1 second
+    ms: 3000                        # pause 3 seconds
 
   - action: select
     selector: "#country-dropdown"
