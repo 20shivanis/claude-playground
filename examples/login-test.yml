@@ -8,10 +8,10 @@ steps:
 
   - action: login
     usernameSelector: "#USER"
-    passwordSelector: "#password"
-    submitSelector: "button[type=submit]"
-    username: myuser@example.com
-    password: mysecretpassword
+    passwordSelector: "#PASSWORD"
+    submitSelector: "#signInButton"
+    username: YOUR_USERNAME
+    password: YOUR_PASSWORD
     waitForSelector: ".dashboard"   # wait for this after login
     timeout: 30000
 
